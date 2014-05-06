@@ -8,7 +8,7 @@ class LinkAggregator:
         self._site_graph = site_graph
 
     def filter_update_links(self, links, parent_path):
-        self._logger.info("Processing %d links obtained from path %s "%(len(links), parent_path))
+        self._logger.info("Aggregating %d links obtained from path %s "%(len(links), parent_path))
         transformed_links = links
         transformed_links = self.apply_maps(self._link_mappers,transformed_links)
         self._logger.debug("Transformed links: %s"%str(transformed_links))
@@ -34,6 +34,7 @@ class LinkAggregator:
                 transformed_links.append(transformed_link)
             except:
                 self._logger.warn("Encountered error transforming link %s . Dropping it..."%link)
+        return transformed_links
 
     def apply_filters(self, link_filters, links):
         filtered_links = []
@@ -47,5 +48,6 @@ class LinkAggregator:
                     filtered_links.append(link)
             except:
                 self._logger.warn("Encountered error filtering link %s . Dropping it..."%link)
+        return filtered_links
 
 

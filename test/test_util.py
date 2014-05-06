@@ -40,9 +40,12 @@ class UtilTest(unittest.TestCase):
     def test_norm_with_domain(self):
         normalizer = URLNormalizer("acme.com", 80)
         test_expectation = {'www.acme.com':"http://acme.com",
+                            'www.acme.com:80/b':"http://acme.com/b",
                             'acme.com:80/':"http://acme.com",
                              ' hTTp://www.acme.com:80/kjbk ':'http://www.acme.com/kjbk',
                              ' /a/b ':'http://acme.com/a/b',
+                             ' /page.htm ':'http://acme.com/page.htm',
+                             'acme.com/a/b ':'http://acme.com/a/b',
                             'http://bar.org:80/?q=sds+asa#frag':"http://bar.org"}
         for input, expectation in test_expectation.items():
             logging.debug("Testing normalization of url: %s"%input)

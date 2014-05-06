@@ -49,11 +49,11 @@ def init_crawler():
     page_fetcher.set_fetch_result_handler(orchestrator.handle_page_fetch_result)
 
     logger.info("Initiating crawl...")
-    page_fetcher.fetch_page(normalized_url)
+    orchestrator.init_crawl(normalized_url)
     termination_cond_var.wait()
     logger.info("Crawl complete. Shutting down...")
     page_fetcher.shutdown()
-    logger.info("Site graph:")
+    logger.info("Site graph, in the form [array of pages] , [array of (src,dest) link tuples] follows: ")
     logger.info(site_graph.stringize())
 
 if __name__ == "__main__":

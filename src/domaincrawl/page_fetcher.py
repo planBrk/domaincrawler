@@ -41,25 +41,23 @@ class PageFetcher:
         error = response.error
         parsed_req_url = urlparse(response.request.url)
         req_url_path = parsed_req_url
-        effective_url_path = None
-        self._logger.info("Received callback after fetching URL: %s"% str(req_url_path))
+        request_url_path = None
+        self._logger.info("Received callback after fetching URL: %s"% str(response.request.url))
         if error is not None:
-            self._logger.info("Encountered error fetching page %s ." % req_url_path)
-            invoke_callback(self._fetch_result_handler, self._logger, PageFetchResult(is_fetch_successful, response_body, effective_url_path, error, response_code))
+            self._logger.warn("Encountered error fetching page %s ." % req_url_path)
+            invoke_callback(self._fetch_result_handler, self._logger, PageFetchResult(is_fetch_successful, response_body, request_url_path, error, response_code))
             return
         response_code = response.code
-        self._logger.info("Proceeding to read response code")
+        self._logger.debug("Proceeding to read response code")
         self._logger.debug("Received response %d fetching page %s ." % (response_code, req_url_path))
         if response_code == 200:
-            parsed_url = urlparse(response.effective_url)
-            effective_url_path = parsed_url.path
+            request_url_path = response.request.url
             self._logger.debug("Configured max page size %d, response body size %d ." % (self._max_page_size, len(response.body)))
             if len(response.body) <= self._max_page_size:
                 is_fetch_successful = True
                 response_body = response.body
                 self._logger.debug("Successfully looked up body for the url")
-        fetch_result = PageFetchResult(is_fetch_successful, response_body, effective_url_path, error, response_code)
-        print ("path: " + str(fetch_result.path))
+        fetch_result = PageFetchResult(is_fetch_successful, response_body, request_url_path, error, response_code)
         invoke_callback(self._fetch_result_handler, self._logger, fetch_result)
 
     def shutdown(self):

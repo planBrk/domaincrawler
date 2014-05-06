@@ -85,7 +85,12 @@ def web_domain_to_scheme_url(raw_url):
             raw_url_lc = HTTP + SCHEME_SEPARATOR + raw_url_lc
         else:
             return raw_url_lc
-    raw_url_sans_port = raw_url_lc
+
+    raw_url_sans_path = raw_url_lc
+    if (raw_url_sans_path.find(PATH_SEPARATOR) != -1):
+        raw_url_sans_path = raw_url_sans_path.partition(PATH_SEPARATOR)[0]
+
+    raw_url_sans_port = raw_url_sans_path
     if (raw_url_sans_port.find(HOST_PORT_SEPARATOR) != -1):
         raw_url_sans_port = raw_url_sans_port.rpartition(HOST_PORT_SEPARATOR)[0]
     if _is_valid_domain(raw_url_sans_port):
