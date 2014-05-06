@@ -4,7 +4,7 @@ Domain Crawler
 A command line utility to crawl a single domain. When invoked from the console, it prints the site map as a digraph in the form of a sequence of 
 vertices and edges. 
 
-#Setup:
+##Setup:
 To use the crawler:
 
 * Clone this repository: 
@@ -21,14 +21,23 @@ To use the crawler:
 >Crawl a single domain
 >
 >optional arguments:
+
 >  -h, --help            show this help message and exit
+
 >  --alt_conf_path ALT_CONF_PATH
+
 >                        Path to a python config (without sections) that may be
+
 >                        used to override config defaults
+
 >  --log_conf LOG_CONF   The location of the logging configuration file in the
+
 >                        python logging config format
+
 >  --url URL             The base url with the domain name of the site to be
+
 >                        crawled. (e.g. http://acme.com)
 
-Limitations and Enhancements:
+
+##Limitations and Enhancements:
 Refer to [this page](https://github.com/planBrk/domaincrawler/wiki/Current-limitations-&-Pending-enhancements) for details.
