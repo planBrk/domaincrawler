@@ -1,0 +1,9 @@
+Cython==0.20.1
+backports.ssl-match-hostname==3.4.0.2
+futures==2.1.6
+pydot==1.0.28
+pyparsing==2.0.1
+python-graph-core==1.8.2
+python-graph-dot==1.8.2
+robotexclusionrulesparser==1.6.2
+tornado==3.2
