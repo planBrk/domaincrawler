@@ -23,29 +23,29 @@ class CrawlOrchestrator:
 # PageFetchResult = namedtuple('PageFetchResult',['status','body','path','error','response_code'])
     def handle_page_fetch_result(self, fetch_result):
         with self._lock:
-            self._inflight_page_fetches -= 1
-            self._logger.info("Processing page fetch response for path: %s "%fetch_result.path)
-            if fetch_result.status:
-                self._logger.debug("Submitting job to extract links for page successfully extracted at path: %s "%fetch_result.path)
-                future = self._executor.submit(self._extract_links,fetch_result.path, fetch_result.body, self._logger)
-                self._inflight_futures[future] = fetch_result.path
-                future.add_done_callback(self._page_parse_callback)
-            if (len(self._inflight_futures) == 0 and self._inflight_page_fetches == 0):
-                self._logger.info("Site crawl completed. Notifying listener")
-                self._termination_cond.set()
+            try:
+                self._inflight_page_fetches -= 1
+                self._logger.info("Processing page fetch response for path: %s "%fetch_result.path)
+                if fetch_result.status:
+                    self._logger.debug("Submitting job to extract links for page successfully extracted at path: %s "%fetch_result.path)
+                    future = self._executor.submit(self._extract_links,fetch_result.path, fetch_result.body, self._logger)
+                    self._inflight_futures[future] = fetch_result.path
+                    future.add_done_callback(self._page_parse_callback)
+            finally:
+                self._notify_if_complete()
 
     def _page_parse_callback(self, future):
         with self._lock:
-            path = self._inflight_futures.pop(future, None)
-            exception = future.exception()
-            if exception is not None:
-                self._logger.debug("Encountered exception %s encountered parsing contents of page at path %s"%(str(exception),path))
-            else:
-                links = future.result()
-                self._lookup_links(links, path)
-            if (len(self._inflight_futures) == 0 and self._inflight_page_fetches == 0):
-                self._logger.info("Site crawl completed. Notifying listener")
-                self._termination_cond.set()
+            try:
+                path = self._inflight_futures.pop(future, None)
+                exception = future.exception()
+                if exception is not None:
+                    self._logger.debug("Encountered exception %s encountered parsing contents of page at path %s"%(str(exception),path))
+                else:
+                    links = future.result()
+                    self._lookup_links(links, path)
+            finally:
+                self._notify_if_complete()
 
     def _lookup_links(self, links, path):
         with self._lock:
@@ -57,4 +57,9 @@ class CrawlOrchestrator:
                 self._fetch_page(link)
                 self._inflight_page_fetches += 1
                 self._logger.debug("Inflight page fetches: %d" % self._inflight_page_fetches)
+
+    def _notify_if_complete(self):
+        if (len(self._inflight_futures) == 0 and self._inflight_page_fetches == 0):
+            self._logger.info("Site crawl completed. Notifying listener")
+            self._termination_cond.set()
 

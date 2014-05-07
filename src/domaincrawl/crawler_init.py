@@ -22,6 +22,7 @@ def init_crawler():
     base_url = input['url']
     page_fetcher = None
     logger = None
+    site_graph = None
     try:
         base_domain, port = extract_domain_port(base_url)
         conf_path = input.get('alt_conf_path', None)
@@ -63,7 +64,7 @@ def init_crawler():
     if page_fetcher:
         page_fetcher.shutdown()
 
-    if logger:
+    if logger and site_graph:
         logger.info("Site graph, in the form [array of pages] , [array of (src,dest) link tuples] follows: ")
         logger.info(site_graph.stringize())
 

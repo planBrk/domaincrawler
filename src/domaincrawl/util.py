@@ -17,6 +17,10 @@ HTTP_DEFAULT_PORT = 80
 SCHEME_SEPARATOR = '://'
 PATH_SEPARATOR = '/'
 
+
+def is_empty(some_str):
+    return (not some_str) or len(some_str.strip()) == 0
+
 class URLNormalizer:
 
     def __init__(self, host, port):
@@ -34,10 +38,10 @@ class URLNormalizer:
         url_components = urlparse(normalized_url)
         split_url = list(url_components[0:3]) #We remove the query params & fragment from the URL
         split_url.extend(['','',''])
-        is_scheme_empty = url_components.scheme is None or len(string.strip(url_components.scheme)) == 0
+        is_scheme_empty = is_empty(url_components.scheme)
         if is_scheme_empty:
             split_url[0] = HTTP
-        is_netloc_empty = url_components.netloc is None or len(string.strip(url_components.netloc)) == 0
+        is_netloc_empty = is_empty(url_components.netloc)
         if is_netloc_empty and (is_scheme_empty or (split_url[0] in ACCEPTABLE_SCHEMES)):
             split_url[1] = self._netloc
         path = split_url[2]
@@ -47,7 +51,7 @@ class URLNormalizer:
         return url_with_domain
 
 def extract_domain_port(reference_url):
-    if (not reference_url or len(reference_url.strip()) == 0):
+    if is_empty(reference_url):
         raise ValueError("Input URL for domain extraction cannot be null")
     trimmed_url = reference_url.strip().lower()
     trimmed_url = web_domain_to_scheme_url(trimmed_url)
@@ -56,7 +60,7 @@ def extract_domain_port(reference_url):
     if not (scheme is None or scheme.strip().lower() in ACCEPTABLE_SCHEMES):
         raise ValueError("The URL scheme must be http or https")
     domain = raw_split_url.hostname
-    if domain is None or len(domain.strip().lower()) == 0:
+    if is_empty(domain):
         raise ValueError("Null or empty domain. Expected domain to be specified in the URL tuple %s "%str(raw_split_url))
 
     normalized_split_url = urlsplit(norms(trimmed_url))
@@ -81,7 +85,7 @@ def web_domain_to_scheme_url(raw_url):
         raw_url_lc = raw_url_lc[len(WWW_PREFIX):]
     elif (raw_url_lc.find(SCHEME_SEPARATOR) != -1):
         scheme = raw_url_lc.partition(SCHEME_SEPARATOR)[0]
-        if (not scheme or len(scheme.strip()) == 0):
+        if is_empty(scheme):
             raw_url_lc = HTTP + SCHEME_SEPARATOR + raw_url_lc
         else:
             return raw_url_lc

@@ -4,6 +4,7 @@ import string
 from urlparse import urlparse, urlunparse
 from robotexclusionrulesparser import RobotExclusionRulesParser
 from util import ACCEPTABLE_SCHEMES, WWW_PREFIX, extract_domain_port
+from util import is_empty
 
 ROBOTS_FILE = 'robots.txt'
 
@@ -21,7 +22,7 @@ class DomainFilter:
     def passes(self, url):
         split_url = urlparse(url)
         domain = split_url.hostname
-        if (not domain or len(domain) == 0):
+        if is_empty(domain):
             return False
         is_allowed = (self._domain_match_regex.match(domain) is not None)
         self._logger.debug("Result of applying domain filter for url %s : %s"%(str(url), str(is_allowed)))
